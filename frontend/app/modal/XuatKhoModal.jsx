@@ -11,6 +11,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import XuatKhoService from '../services/xuatKhoService.mjs';
 import ThanhPhamService from '../services/thanhphamService.jsx';
+import CongThucService from '../services/congThucService.jsx';
 import { Toast } from 'primereact/toast';
 
 const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
@@ -20,6 +21,7 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
   const [chiTiet, setChiTiet] = useState([]);
   const [thanhPham, setThanhPham] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -42,7 +44,66 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
     }
   };
 
-  const addChiTiet = () => {
+  const checkThanhPhamStatus = async (thanhPhamId) => {
+    setCheckingStatus(true);
+    try {
+      // Kiểm tra xem thành phẩm có công thức không
+      const congThucResponse = await CongThucService.getByThanhPhamId(thanhPhamId);
+      if (!congThucResponse.success || !congThucResponse.data || congThucResponse.data.length === 0) {
+        toast.current?.show({ 
+          severity: 'warn', 
+          summary: 'Cảnh báo', 
+          detail: 'Thành phẩm này chưa có công thức. Vui lòng thêm công thức trước khi xuất kho.'
+        });
+        return false;
+      }
+      
+      // Kiểm tra số lượng tồn của thành phẩm để xác định đã được sản xuất chưa
+      const thanhPhamResponse = await ThanhPhamService.getById(thanhPhamId);
+      if (!thanhPhamResponse.success) {
+        toast.current?.show({ 
+          severity: 'error', 
+          summary: 'Lỗi', 
+          detail: 'Không thể kiểm tra thông tin thành phẩm'
+        });
+        return false;
+      }
+      
+      // Nếu số lượng tồn = 0 hoặc không có, thì thành phẩm chưa được sản xuất
+      if (!thanhPhamResponse.data.So_luong || thanhPhamResponse.data.So_luong <= 0) {
+        toast.current?.show({ 
+          severity: 'warn', 
+          summary: 'Cảnh báo', 
+          detail: 'Thành phẩm này chưa được sản xuất. Vui lòng sản xuất trước khi xuất kho.'
+        });
+        return false;
+      }
+      
+      // Kiểm tra nếu số lượng muốn xuất kho vượt quá số lượng tồn
+      if (soLuong > thanhPhamResponse.data.So_luong) {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Cảnh báo',
+          detail: `Số lượng xuất kho (${soLuong}) vượt quá số lượng tồn kho (${thanhPhamResponse.data.So_luong}).`
+        });
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error checking thanh pham status:', error);
+      toast.current?.show({ 
+        severity: 'error', 
+        summary: 'Lỗi', 
+        detail: 'Không thể kiểm tra trạng thái thành phẩm'
+      });
+      return false;
+    } finally {
+      setCheckingStatus(false);
+    }
+  };
+
+  const addChiTiet = async () => {
     if (!selectedThanhPham) {
       toast.current?.show({ severity: 'warn', summary: 'Cảnh báo', detail: 'Vui lòng chọn thành phẩm' });
       return;
@@ -50,6 +111,12 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
 
     if (soLuong <= 0) {
       toast.current?.show({ severity: 'warn', summary: 'Cảnh báo', detail: 'Số lượng phải lớn hơn 0' });
+      return;
+    }
+
+    // Kiểm tra tình trạng công thức và sản xuất
+    const statusOk = await checkThanhPhamStatus(selectedThanhPham.Id);
+    if (!statusOk) {
       return;
     }
 
@@ -174,7 +241,7 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
     >
       <div className="grid">
         <div className="col-12 mb-4">
-          <label htmlFor="ghiChu" className="font-medium mb-2 block">Ghi chú</label>
+          <label htmlFor="ghiChu" className="font-medium mb-3 block">Ghi chú</label>
           <InputTextarea 
             id="ghiChu" 
             value={ghiChu} 
@@ -193,6 +260,7 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
               icon="pi pi-plus" 
               onClick={addChiTiet}
               className="p-button-sm"
+              loading={checkingStatus}
               style={{ width: '100px' }}
             />
           </div>

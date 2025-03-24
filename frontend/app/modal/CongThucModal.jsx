@@ -110,6 +110,15 @@ function CongThucModal({ visible, thanhPhamId, congThucId, onHide, onSuccess }) 
     }
   }, [visible, thanhPhamId, congThucId]);
 
+  // Thêm useEffect để tự động cập nhật đơn vị tính khi chọn nguyên liệu
+  useEffect(() => {
+    if (selectedNguyenLieu) {
+      setDonViTinh(selectedNguyenLieu.Don_vi_tinh || '');
+    } else {
+      setDonViTinh('');
+    }
+  }, [selectedNguyenLieu]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -288,6 +297,7 @@ function CongThucModal({ visible, thanhPhamId, congThucId, onHide, onSuccess }) 
                   onChange={(e) => setDonViTinh(e.target.value)}
                   placeholder="Đơn vị tính"
                   className="w-full"
+                  disabled
                 />
               </div>
               

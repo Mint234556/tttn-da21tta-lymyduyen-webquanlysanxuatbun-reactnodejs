@@ -74,14 +74,57 @@ const ThanhPhamPage = () => {
     setDisplayDialog(true);
   };
 
-  const confirmDelete = (id) => {
-    confirmDialog({
-      message: 'Bạn có chắc chắn muốn xóa mục này không?',
-      header: 'Xác nhận xóa',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => deleteData(id),
-      reject: () => showError('Hủy thao tác xóa')
-    });
+  const confirmDelete = async (id) => {
+    try {
+      // Lấy thông tin thành phẩm để kiểm tra số lượng tồn kho
+      const response = await ThanhPhamService.getById(id);
+      
+      if (response.success && response.data) {
+        const thanhPham = response.data;
+        
+        // Nếu thành phẩm đã được sản xuất (có số lượng tồn kho)
+        if (thanhPham.So_luong && thanhPham.So_luong > 0) {
+          confirmDialog({
+            message: `Thành phẩm "${thanhPham.Ten_thanh_pham}" hiện có ${thanhPham.So_luong} ${thanhPham.Don_vi_tinh} đã được sản xuất trong kho. Bạn có chắc chắn muốn xóa không?`,
+            header: 'Cảnh báo: Thành phẩm đã sản xuất',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Xóa',
+            rejectLabel: 'Hủy',
+            acceptClassName: 'p-button-danger',
+            accept: () => deleteData(id),
+            reject: () => showError('Hủy thao tác xóa')
+          });
+        } else {
+          // Xác nhận thông thường nếu chưa sản xuất
+          confirmDialog({
+            message: 'Bạn có chắc chắn muốn xóa mục này không?',
+            header: 'Xác nhận xóa',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => deleteData(id),
+            reject: () => showError('Hủy thao tác xóa')
+          });
+        }
+      } else {
+        // Fallback nếu không lấy được thông tin thành phẩm
+        confirmDialog({
+          message: 'Bạn có chắc chắn muốn xóa mục này không?',
+          header: 'Xác nhận xóa',
+          icon: 'pi pi-exclamation-triangle',
+          accept: () => deleteData(id),
+          reject: () => showError('Hủy thao tác xóa')
+        });
+      }
+    } catch (error) {
+      console.error('Lỗi khi kiểm tra thông tin thành phẩm:', error);
+      // Fallback nếu có lỗi
+      confirmDialog({
+        message: 'Bạn có chắc chắn muốn xóa mục này không?',
+        header: 'Xác nhận xóa',
+        icon: 'pi pi-exclamation-triangle',
+        accept: () => deleteData(id),
+        reject: () => showError('Hủy thao tác xóa')
+      });
+    }
   };
 
   const deleteData = async (id) => {

@@ -180,47 +180,60 @@ const XuatKhoEditModal = ({ visible, onHide, onSuccess, toast, xuatKhoId }) => {
       style={{ width: '80vw' }} 
       footer={footer} 
       onHide={onHide}
+      className="xuat-kho-dialog"
     >
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 md:col-4">
-          <label htmlFor="ma">Mã phiếu</label>
-          <InputText id="ma" value={xuatKhoData.Ma_xuat_kho || ''} readOnly />
-        </div>
-        <div className="field col-12 md:col-4">
-          <label htmlFor="date">Ngày xuất</label>
-          <InputText 
-            id="date" 
-            value={new Intl.DateTimeFormat('vi-VN', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            }).format(new Date(xuatKhoData.Ngay_xuat))} 
-            readOnly 
-          />
-        </div>
-        <div className="field col-12 md:col-4">
-          <label htmlFor="user">Người xuất</label>
-          <InputText id="user" value={xuatKhoData.Nguoi_xuat || ''} readOnly />
+      <div className="p-fluid">
+        <div className="grid formgrid mb-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '6px', padding: '1rem' }}>
+          <div className="field col-12 md:col-4 mb-0">
+            <label htmlFor="ma" className="font-medium block mb-2">Mã phiếu</label>
+            <InputText id="ma" value={xuatKhoData.Ma_xuat_kho || ''} readOnly />
+          </div>
+          <div className="field col-12 md:col-4 mb-0">
+            <label htmlFor="date" className="font-medium block mb-2">Ngày xuất</label>
+            <InputText 
+              id="date" 
+              value={new Intl.DateTimeFormat('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }).format(new Date(xuatKhoData.Ngay_xuat))} 
+              readOnly 
+            />
+          </div>
+          <div className="field col-12 md:col-4 mb-0">
+            <label htmlFor="user" className="font-medium block mb-2">Người xuất</label>
+            <InputText id="user" value={xuatKhoData.Nguoi_xuat || ''} readOnly />
+          </div>
         </div>
         
-        <div className="field col-12">
-          <label htmlFor="ghiChu">Ghi chú</label>
+        <div className="field mb-4">
+          <label htmlFor="ghiChu" className="font-medium block mb-3">Ghi chú</label>
           <InputTextarea 
             id="ghiChu" 
             value={ghiChu} 
             onChange={(e) => setGhiChu(e.target.value)} 
-            rows={3} 
+            rows={2} 
             placeholder="Nhập ghi chú cho phiếu xuất kho"
+            className="w-full"
           />
         </div>
 
-        <div className="field col-12">
-          <h4>Thêm chi tiết xuất kho</h4>
-          <div className="grid">
-            <div className="field col-5">
-              <label htmlFor="thanhPham">Thành phẩm</label>
+        <div className="mb-4">
+          <div className="flex align-items-center justify-content-between mb-3">
+            <h4 className="m-0 text-primary">Thêm chi tiết xuất kho</h4>
+            <Button 
+              label="Thêm" 
+              icon="pi pi-plus" 
+              onClick={addChiTiet}
+              className="p-button-sm"
+              style={{ width: '3cm' }}
+            />
+          </div>
+          <div className="grid formgrid p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '6px' }}>
+            <div className="field col-12 md:col-6 mb-0">
+              <label htmlFor="thanhPham" className="font-medium block mb-2">Thành phẩm</label>
               <Dropdown 
                 id="thanhPham" 
                 value={selectedTP} 
@@ -233,8 +246,8 @@ const XuatKhoEditModal = ({ visible, onHide, onSuccess, toast, xuatKhoId }) => {
               />
             </div>
 
-            <div className="field col-5">
-              <label htmlFor="soLuong">Số lượng</label>
+            <div className="field col-12 md:col-6 mb-0">
+              <label htmlFor="soLuong" className="font-medium block mb-2">Số lượng</label>
               <div className="p-inputgroup">
                 <InputNumber 
                   id="soLuong" 
@@ -243,32 +256,29 @@ const XuatKhoEditModal = ({ visible, onHide, onSuccess, toast, xuatKhoId }) => {
                   min={1} 
                   placeholder="Nhập số lượng"
                   showButtons
+                  buttonLayout="horizontal"
+                  decrementButtonClassName="p-button-secondary"
+                  incrementButtonClassName="p-button-secondary"
+                  incrementButtonIcon="pi pi-plus"
+                  decrementButtonIcon="pi pi-minus"
+                  style={{ maxWidth: '200px' }}
                 />
                 <span className="p-inputgroup-addon">
                   {selectedTP?.Don_vi_tinh || 'Đơn vị'}
                 </span>
               </div>
             </div>
-
-            <div className="field col-2 flex align-items-end">
-              <Button 
-                label="Thêm" 
-                icon="pi pi-plus" 
-                onClick={addChiTiet} 
-                className="w-full"
-              />
-            </div>
           </div>
         </div>
 
-        <div className="field col-12">
-          <h4>Danh sách thành phẩm xuất kho</h4>
-          <DataTable value={chiTiet} emptyMessage="Chưa có thành phẩm nào">
+        <div>
+          <h4 className="text-primary mb-3">Danh sách thành phẩm xuất kho</h4>
+          <DataTable value={chiTiet} emptyMessage="Chưa có thành phẩm nào" className="p-datatable-sm">
             <Column field="Ten_thanh_pham" header="Tên thành phẩm" />
-            <Column field="So_luong" header="Số lượng" />
-            <Column field="Don_vi_tinh" header="Đơn vị tính" />
-            <Column field="Don_gia" header="Đơn giá" body={(rowData) => new Intl.NumberFormat('vi-VN').format(rowData.Don_gia) + ' đ'} />
-            <Column field="Thanh_tien" header="Thành tiền" body={(rowData) => new Intl.NumberFormat('vi-VN').format(rowData.So_luong * rowData.Don_gia) + ' đ'} />
+            <Column field="So_luong" header="Số lượng" style={{ width: '120px' }} />
+            <Column field="Don_vi_tinh" header="Đơn vị tính" style={{ width: '120px' }} />
+            <Column field="Don_gia" header="Đơn giá" body={(rowData) => new Intl.NumberFormat('vi-VN').format(rowData.Don_gia) + ' đ'} style={{ width: '150px' }} />
+            <Column field="Thanh_tien" header="Thành tiền" body={(rowData) => new Intl.NumberFormat('vi-VN').format(rowData.So_luong * rowData.Don_gia) + ' đ'} style={{ width: '150px' }} />
             <Column body={actionBodyTemplate} exportable={false} style={{ width: '80px' }} />
           </DataTable>
         </div>
