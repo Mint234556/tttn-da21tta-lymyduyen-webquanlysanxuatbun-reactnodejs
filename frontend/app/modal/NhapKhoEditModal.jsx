@@ -11,6 +11,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import NhapKhoService from '../services/nhapKhoService.mjs';
 import NguyenVatLieuService from '../services/nguyenvatlieuService.jsx';
+import moment from 'moment-timezone';
 
 const NhapKhoEditModal = ({ visible, onHide, onSuccess, toast, nhapKhoId }) => {
   const [ghiChu, setGhiChu] = useState('');
@@ -189,13 +190,9 @@ const NhapKhoEditModal = ({ visible, onHide, onSuccess, toast, nhapKhoId }) => {
             <label htmlFor="date" className="font-medium block mb-2">Ngày nhập</label>
             <InputText 
               id="date" 
-              value={new Intl.DateTimeFormat('vi-VN', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }).format(new Date(nhapKhoData.Ngay_nhap))} 
+              value={moment(nhapKhoData.Ngay_nhap)
+                .tz('Asia/Ho_Chi_Minh')
+                .format('DD/MM/YYYY HH:mm')} 
               readOnly 
             />
           </div>

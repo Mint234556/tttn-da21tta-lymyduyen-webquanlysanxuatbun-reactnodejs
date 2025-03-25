@@ -19,7 +19,8 @@ const NguyenVatLieuPage = () => {
     Id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
-    Gia: 0
+    Gia: 0,
+    So_luong: 0
   });
 
   const toast = useRef(null);
@@ -50,7 +51,13 @@ const NguyenVatLieuPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ Id: null, Ten_nguyen_lieu: '', Gia: 0, Don_vi_tinh: '' });
+    setFormData({ 
+      Id: null, 
+      Ten_nguyen_lieu: '', 
+      Don_vi_tinh: '', 
+      Gia: 0,
+      So_luong: 0
+    });
     setIsNew(true);
     setDisplayDialog(true);
   };
@@ -109,6 +116,15 @@ const NguyenVatLieuPage = () => {
     return formatCurrency(rowData.Gia);
   };
 
+  const formatNumber = (value) => {
+    if (value === null || value === undefined) return '0';
+    return new Intl.NumberFormat('vi-VN').format(value);
+  };
+
+  const quantityBodyTemplate = (rowData) => {
+    return formatNumber(rowData.So_luong);
+  };
+
   return (
     <div className="p-grid">
       <Toast ref={toast} />
@@ -136,6 +152,7 @@ const NguyenVatLieuPage = () => {
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_nguyen_lieu" header="Tên"></Column>
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
+            <Column field="So_luong" header="Số lượng" body={quantityBodyTemplate}></Column>
             <Column field="Gia" header="Giá" body={priceBodyTemplate}></Column>
             <Column
               body={(rowData) => (
