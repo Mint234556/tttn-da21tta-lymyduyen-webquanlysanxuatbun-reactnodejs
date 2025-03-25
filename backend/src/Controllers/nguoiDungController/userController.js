@@ -5,7 +5,7 @@ const connection = require('../../Config/database');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { userSchema, roleSchema, validate } = require('../../Middleware/validationMiddleware');
 const util = require('util');
-const ApiResponse = require('../../utils/response');
+const ApiResponse = require('../../Utils/response');
 
 const router = express.Router();
 const query = util.promisify(connection.query).bind(connection);

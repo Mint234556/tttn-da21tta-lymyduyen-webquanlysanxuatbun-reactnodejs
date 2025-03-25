@@ -1,5 +1,5 @@
 const express = require('express');
-const XuatKho = require('../../models/xuatKhoModel');
+const XuatKho = require('../../Models/xuatKhoModel');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const router = express.Router();
 

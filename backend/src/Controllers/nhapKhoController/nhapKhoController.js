@@ -1,5 +1,5 @@
 const express = require('express');
-const NhapKho = require('../../models/nhapKhoModel');
+const NhapKho = require('../../Models/nhapKhoModel');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const router = express.Router();
 

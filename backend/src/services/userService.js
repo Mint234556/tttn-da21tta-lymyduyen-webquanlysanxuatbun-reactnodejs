@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
+const User = require('../Models/userModel');
 
 class UserService {
   static async login(username, password) {

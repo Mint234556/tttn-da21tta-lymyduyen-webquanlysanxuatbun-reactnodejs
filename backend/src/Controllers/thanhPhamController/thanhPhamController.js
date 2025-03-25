@@ -1,6 +1,6 @@
 // src/controllers/thanhPhamController.js
 const express = require('express');
-const ThanhPham = require('../../models/thanhphamModel');
+const ThanhPham = require('../../Models/thanhphamModel');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
