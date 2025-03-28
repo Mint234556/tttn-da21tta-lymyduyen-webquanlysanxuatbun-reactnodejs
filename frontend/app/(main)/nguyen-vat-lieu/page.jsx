@@ -19,8 +19,7 @@ const NguyenVatLieuPage = () => {
     Id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
-    Gia: 0,
-    So_luong: 0
+    Gia: 0
   });
 
   const toast = useRef(null);
@@ -51,12 +50,11 @@ const NguyenVatLieuPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ 
-      Id: null, 
-      Ten_nguyen_lieu: '', 
-      Don_vi_tinh: '', 
-      Gia: 0,
-      So_luong: 0
+    setFormData({
+      Id: null,
+      Ten_nguyen_lieu: '',
+      Don_vi_tinh: '',
+      Gia: 0
     });
     setIsNew(true);
     setDisplayDialog(true);
